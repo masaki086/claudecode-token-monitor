@@ -1,4 +1,7 @@
-# Claude Code Context Monitoring
+# Claude Code Token Monitor
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Claude Code Compatible](https://img.shields.io/badge/Claude%20Code-Compatible-blue)](https://claude.ai/code)
 
 Claude Code のフックイベントをキャプチャし、トークン使用状況を監視するためのプロジェクトです。
 
@@ -8,11 +11,14 @@ Claude Code のフックイベントをキャプチャし、トークン使用�
 
 ```bash
 # リポジトリをクローン
-git clone <repository-url>
-cd claudecode-context-monitoring
+git clone https://github.com/masaki086/claudecode-token-monitor.git
+cd claudecode-token-monitor
+
+# 設定ファイルをコピー
+cp .claude/settings.local.json.example .claude/settings.local.json
 
 # スクリプトに実行権限を付与
-chmod +x scripts/*.js
+chmod +x scripts/*.sh
 ```
 
 ### 2. Hooks設定
@@ -28,29 +34,39 @@ chmod +x scripts/*.js
 ### 3. 動作確認
 
 ```bash
-# 検証スクリプトを実行
-node scripts/verify-logging.js
-
 # ログファイルを確認
 ls -la logs/
-tail -f logs/$(date +%Y-%m-%d)-events.jsonl
+tail -f logs/events.jsonl
+
+# バックアップログの確認
+ls -la logs/backups/
 ```
 
 ## 📁 ディレクトリ構造
 
 ```
-claudecode-context-monitoring/
+claudecode-token-monitor/               # ルートディレクトリ
 ├── .claude/
-│   └── settings.local.json    # Claude Code フック設定（Git管理外）
+│   ├── settings.local.json            # Claude Code フック設定（Git管理外）
+│   ├── settings.local.json.example    # 設定ファイルのサンプル
+│   └── commands/                      # スラッシュコマンド
+│       ├── tokens.md                  # 簡易サマリーコマンド
+│       └── tokens-verbose.md          # 詳細サマリーコマンド
 ├── scripts/
-│   ├── log-event.js          # イベントログ記録スクリプト
-│   └── verify-logging.js     # 動作検証スクリプト
-├── logs/                      # イベントログ格納ディレクトリ（Git管理外）
-│   └── YYYY-MM-DD-events.jsonl
-└── internal/                  # 内部ドキュメント
-    ├── requirements/          # 要件定義
-    ├── templates/             # テンプレート
-    └── *.md                   # 各種ガイド文書
+│   ├── log-event.sh                   # イベントログ記録スクリプト
+│   └── lib/
+│       └── token-calculator.js        # トークン計算ロジック
+├── config/
+│   └── token-calculator.json          # トークン計算設定
+├── logs/                               # イベントログ格納ディレクトリ（Git管理外）
+│   ├── events.jsonl                   # 現在のセッションログ
+│   └── backups/                       # 過去のセッションログ
+│       └── YYYY-MM-DD/                # 日付別バックアップディレクトリ
+│           └── events-*.jsonl         # タイムスタンプ付きバックアップ
+├── README.md                           # 英語ドキュメント
+├── README_jp.md                        # 日本語ドキュメント
+├── claude.md                           # Claude Code 用設定
+└── LICENSE                             # MITライセンス
 ```
 
 ## 📊 ログフォーマット
@@ -123,9 +139,11 @@ claudecode-context-monitoring/
 "matcher": "Read|Write|Edit|Bash"  // 監視したいツール名を|で区切る
 ```
 
-### ログ出力先を変更
+### ログ出力先について
 
-`scripts/log-event.js`の`logsDir`変数を編集してください。
+- 現在のセッションログ: `logs/events.jsonl`
+- バックアップログ: `logs/backups/YYYY-MM-DD/events-*.jsonl`
+- 新しいセッション開始時に自動的に前のログがバックアップされます
 
 ### デバッグモード
 
@@ -139,30 +157,25 @@ export DEBUG_HOOKS=true
 
 ### ログが記録されない場合
 
-1. Node.jsがインストールされているか確認
+1. スクリプトの実行権限を確認
    ```bash
-   node --version
+   ls -la scripts/*.sh
    ```
 
-2. スクリプトの実行権限を確認
-   ```bash
-   ls -la scripts/*.js
-   ```
-
-3. 検証スクリプトを実行
-   ```bash
-   node scripts/verify-logging.js
-   ```
-
-4. ログディレクトリの権限を確認
+2. ログディレクトリの権限を確認
    ```bash
    ls -la logs/
    ```
 
-5. 手動でテスト実行
+3. 手動でテスト実行
    ```bash
-   node scripts/log-event.js UserPromptSubmit "test prompt"
-   cat logs/$(date +%Y-%m-%d)-events.jsonl
+   ./scripts/log-event.sh UserPromptSubmit "test prompt"
+   cat logs/events.jsonl
+   ```
+
+4. バックアップディレクトリを確認
+   ```bash
+   ls -la logs/backups/
    ```
 
 ## 📝 注意事項
@@ -184,6 +197,27 @@ export DEBUG_HOOKS=true
 - 使用量アラート機能
 - データ分析ツール
 
-## 📝 開発プロセス
+## 📊 トークン使用量の確認
 
-新機能の開発は`/internal/development-process.md`に従って6フェーズで実施されます。
+Claude Code セッション内で以下のスラッシュコマンドを使用：
+
+- `/tokens` - 現在のトークン使用量の簡易サマリー
+- `/tokens-verbose` - イベント種別ごとの詳細な内訳
+
+### 出力例
+
+```
+📊 Token Usage Summary
+=====================
+Total: 12,845 tokens
+Context Window: 12.8% (100,000 tokens)
+
+Breakdown:
+• User Inputs: 2,345 tokens
+• File Reads: 8,500 tokens  
+• Web Operations: 2,000 tokens
+```
+
+## 🤝 コントリビューション
+
+プルリクエストを歓迎します！[Issues](https://github.com/masaki086/claudecode-token-monitor/issues)で問題報告や機能提案をお願いします。

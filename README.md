@@ -28,7 +28,7 @@ A comprehensive token usage monitoring tool for Claude Code sessions. Track your
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/YOUR_USERNAME/claudecode-token-monitor.git
+git clone https://github.com/masaki086/claudecode-token-monitor.git
 cd claudecode-token-monitor
 ```
 
@@ -89,26 +89,36 @@ Edit `config/token-calculator.json` to customize:
 ## 📂 Project Structure
 
 ```
-claudecode-token-monitor/
+claudecode-token-monitor/           # Root directory
 ├── scripts/
-│   ├── log-event.sh          # Main event logging script
+│   ├── log-event.sh                # Main event logging script
 │   └── lib/
-│       ├── token-calculator.js   # Token calculation logic
-│       └── token-summary.js      # Summary generation
+│       └── token-calculator.js     # Token calculation logic
 ├── config/
-│   └── token-calculator.json     # Configuration file
+│   └── token-calculator.json       # Configuration file
 ├── logs/
-│   └── events.jsonl              # Event log (auto-created)
+│   ├── events.jsonl                # Current session event log
+│   └── backups/                    # Archived session logs
+│       └── YYYY-MM-DD/            # Date-based backup directory
+│           └── events-*.jsonl      # Timestamped backup files
 ├── .claude/
-│   ├── commands/                 # Slash commands
-│   └── settings.local.json       # Hook configuration
-└── README.md
+│   ├── commands/                   # Slash commands
+│   │   ├── tokens.md              # Quick summary command
+│   │   └── tokens-verbose.md      # Detailed summary command
+│   ├── settings.local.json         # Hook configuration (not in git)
+│   └── settings.local.json.example # Example configuration
+├── README.md                        # English documentation
+├── README_jp.md                     # Japanese documentation
+├── claude.md                        # Claude Code instructions
+└── LICENSE                          # MIT License
 ```
 
 ## 🔧 How It Works
 
 1. **Event Hooks**: Claude Code triggers hooks for various events (user input, file operations, etc.)
 2. **Event Logging**: Each event is logged to `logs/events.jsonl` with metadata
+   - Session start automatically backs up previous logs to `logs/backups/YYYY-MM-DD/events-*.jsonl`
+   - Each new session starts with a fresh `events.jsonl` file
 3. **Token Calculation**: Language-aware token estimation based on character count
 4. **Session Tracking**: Events are grouped by session ID for accurate tracking
 
@@ -134,7 +144,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📧 Support
 
-For issues, questions, or suggestions, please [open an issue](https://github.com/YOUR_USERNAME/claudecode-token-monitor/issues).
+For issues, questions, or suggestions, please [open an issue](https://github.com/masaki086/claudecode-token-monitor/issues).
 
 ---
 
