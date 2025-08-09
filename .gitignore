@@ -1,0 +1,21 @@
+# Logs
+logs/*.jsonl
+logs/*.log
+!logs/.gitkeep
+
+# Local settings
+.claude/settings.local.json
+
+# Node
+node_modules/
+
+# OS
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
+
+# Environment
+.env
+.env.local

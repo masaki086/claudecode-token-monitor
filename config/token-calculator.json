@@ -1,0 +1,24 @@
+{
+  "contextWindow": {
+    "size": 100000,
+    "warningThreshold": 0.8,
+    "cautionThreshold": 0.6
+  },
+  "tokenEstimates": {
+    "webFetch": {
+      "tokens": 2500,
+      "description": "Average tokens for a web page fetch"
+    },
+    "webSearch": {
+      "tokens": 1750,
+      "description": "Average tokens for search results"
+    }
+  },
+  "languageDetection": {
+    "japaneseThreshold": 0.2,
+    "tokensPerCharacter": {
+      "japanese": 2.5,
+      "english": 4.0
+    }
+  }
+}

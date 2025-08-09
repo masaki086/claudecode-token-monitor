@@ -1,0 +1,31 @@
+{
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "command": "$CLAUDE_PROJECT_DIR/scripts/log-event.sh UserPromptSubmit"
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Read|WebFetch|WebSearch|Grep|Glob|Write|Edit|MultiEdit|NotebookEdit",
+        "command": "$CLAUDE_PROJECT_DIR/scripts/log-event.sh PreToolUse"
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Read|WebFetch|WebSearch|Grep|Glob|Write|Edit|MultiEdit|NotebookEdit",
+        "command": "$CLAUDE_PROJECT_DIR/scripts/log-event.sh PostToolUse"
+      }
+    ],
+    "SessionStart": [
+      {
+        "command": "$CLAUDE_PROJECT_DIR/scripts/log-event.sh SessionStart"
+      }
+    ],
+    "Stop": [
+      {
+        "command": "$CLAUDE_PROJECT_DIR/scripts/log-event.sh Stop"
+      }
+    ]
+  }
+}
