@@ -1,0 +1,14 @@
+{
+  "name": "claudecode-token-monitor",
+  "version": "1.0.0",
+  "description": "Token usage monitoring tool for Claude Code sessions",
+  "main": "scripts/lib/token-calculator.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "token-calc": "node scripts/lib/token-calculator.js",
+    "token-calc:verbose": "node scripts/lib/token-calculator.js --verbose"
+  },
+  "keywords": ["claude", "claude-code", "token", "monitoring"],
+  "author": "",
+  "license": "MIT"
+}

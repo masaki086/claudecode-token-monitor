@@ -7,7 +7,7 @@ allowed-tools:
 現在のセッションのトークン使用量を詳細表示で計算してください。
 
 ```bash
-cd $CLAUDE_PROJECT_DIR && npm run token-calc -- --verbose
+cd $CLAUDE_PROJECT_DIR && npm run token-calc:verbose
 ```
 
 以下の情報を含めて表示してください：
