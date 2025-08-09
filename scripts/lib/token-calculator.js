@@ -325,7 +325,7 @@ class TokenCalculator {
     const barWidth = 30;
     const filledWidth = Math.round((this.sessionData.totals.totalTokens / CONTEXT_WINDOW_SIZE) * barWidth);
     const emptyWidth = barWidth - filledWidth;
-    const progressBar = '[' + '█'.repeat(filledWidth) + '░'.repeat(emptyWidth) + ']';
+    const progressBar = '[' + '#'.repeat(filledWidth) + '.'.repeat(emptyWidth) + ']';
     lines.push(`  ${progressBar}`);
     
     // 警告表示（設定ファイルの闾値に基づく）
