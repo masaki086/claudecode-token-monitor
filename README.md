@@ -73,18 +73,31 @@ Edit `config/token-calculator.json` to customize:
 
 ```json
 {
+  "outputLanguage": "en",  // "en" for English, "ja" for Japanese
   "contextWindow": {
     "size": 100000,
-    "warningThreshold": 0.8
+    "warningThreshold": 0.8,
+    "cautionThreshold": 0.6
   },
   "tokenEstimates": {
-    "japaneseCharsPerToken": 2.5,
-    "englishCharsPerToken": 4,
     "webFetch": { "tokens": 2500 },
     "webSearch": { "tokens": 1750 }
+  },
+  "languageDetection": {
+    "japaneseThreshold": 0.2,
+    "tokensPerCharacter": {
+      "japanese": 2.5,
+      "english": 4.0
+    }
   }
 }
 ```
+
+### Language Settings
+
+The tool supports multilingual output:
+- Set `"outputLanguage": "en"` for English output (default)
+- Set `"outputLanguage": "ja"` for Japanese output (日本語表示)
 
 ## 📂 Project Structure
 

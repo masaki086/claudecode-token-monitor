@@ -1,4 +1,5 @@
 {
+  "outputLanguage": "ja",
   "contextWindow": {
     "size": 100000,
     "warningThreshold": 0.8,

@@ -131,6 +131,20 @@ claudecode-token-monitor/               # ルートディレクトリ
 
 ## 🔧 カスタマイズ
 
+### 出力言語の設定
+
+`config/token-calculator.json` の `outputLanguage` を編集することで、トークン使用状況レポートの表示言語を切り替えられます：
+
+```json
+{
+  "outputLanguage": "ja",  // "en" で英語表示、"ja" で日本語表示
+  // ...
+}
+```
+
+- `"outputLanguage": "en"` - 英語で表示（デフォルト）
+- `"outputLanguage": "ja"` - 日本語で表示
+
 ### 監視するツールを変更
 
 `.claude/settings.local.json`の`PreToolUse`セクションの`matcher`を編集：

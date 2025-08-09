@@ -18,6 +18,9 @@ class TokenCalculator {
     // 設定ファイルの読み込み
     this.config = this.loadConfig();
     
+    // メッセージの初期化
+    this.messages = this.getMessages();
+    
     // セッションデータの初期化
     this.sessionData = {
       sessionId: null,
@@ -70,8 +73,76 @@ class TokenCalculator {
           japanese: 2.5,
           english: 4.0
         }
+      },
+      outputLanguage: 'en'
+    };
+  }
+
+  /**
+   * 言語別メッセージを取得
+   */
+  getMessages() {
+    const messages = {
+      en: {
+        title: 'Claude Code Token Usage Report',
+        sessionId: 'Session ID',
+        startTime: 'Start Time',
+        tokenUsageSummary: 'Token Usage Summary',
+        userInput: 'User Input',
+        filesRead: 'Files Read',
+        filesWritten: 'Files Written',
+        initialContext: 'Initial Context',
+        totalTokens: 'Total Tokens',
+        contextWindowUsage: 'Context Window Usage',
+        ofTokens: 'of',
+        tokens: 'tokens',
+        warning: 'WARNING: Context window usage is above',
+        warningMessage: 'Old conversation history may be dropped soon.',
+        note: 'Note: Context window usage is above',
+        languageDetection: 'Language Detection',
+        japaneseContent: 'Japanese Content',
+        calculatedAs: '(calculated as ',
+        calculatedAsSuffix: ')',
+        japanese: 'Japanese',
+        english: 'English',
+        detailedBreakdown: 'Detailed Breakdown',
+        userInputs: 'User Inputs',
+        filesReadList: 'Files Read',
+        filesWrittenList: 'Files Written',
+        estimated: 'estimated'
+      },
+      ja: {
+        title: 'Claude Code トークン使用状況レポート',
+        sessionId: 'セッションID',
+        startTime: '開始時刻',
+        tokenUsageSummary: 'トークン使用状況サマリー',
+        userInput: 'ユーザー入力',
+        filesRead: 'ファイル読み込み',
+        filesWritten: 'ファイル書き込み',
+        initialContext: '初期コンテキスト',
+        totalTokens: '合計トークン',
+        contextWindowUsage: 'コンテキストウィンドウ使用率',
+        ofTokens: '/',
+        tokens: 'トークン',
+        warning: '警告: コンテキストウィンドウ使用率が',
+        warningMessage: '古い会話履歴が削除される可能性があります。',
+        note: '注意: コンテキストウィンドウ使用率が',
+        languageDetection: '言語判定',
+        japaneseContent: '日本語コンテンツ',
+        calculatedAs: '(',
+        calculatedAsSuffix: 'として計算)',
+        japanese: '日本語',
+        english: '英語',
+        detailedBreakdown: '詳細内訳',
+        userInputs: 'ユーザー入力',
+        filesReadList: '読み込みファイル',
+        filesWrittenList: '書き込みファイル',
+        estimated: '推定'
       }
     };
+    
+    const lang = this.config.outputLanguage || 'en';
+    return messages[lang] || messages.en;
   }
 
   /**
@@ -297,29 +368,29 @@ class TokenCalculator {
     const lines = [];
 
     lines.push(separator);
-    lines.push('Claude Code Token Usage Report');
+    lines.push(this.messages.title);
     lines.push(separator);
     
     if (this.sessionData.sessionId) {
-      lines.push(`Session ID: ${this.sessionData.sessionId}`);
-      lines.push(`Start Time: ${this.sessionData.startTime}`);
+      lines.push(`${this.messages.sessionId}: ${this.sessionData.sessionId}`);
+      lines.push(`${this.messages.startTime}: ${this.sessionData.startTime}`);
       lines.push('');
     }
 
-    lines.push('Token Usage Summary:');
-    lines.push(`- User Input:        ${this.formatNumber(this.sessionData.totals.userInputTokens)} tokens`);
-    lines.push(`- Files Read:        ${this.formatNumber(this.sessionData.totals.fileReadTokens)} tokens`);
-    lines.push(`- Files Written:     ${this.formatNumber(this.sessionData.totals.fileWriteTokens)} tokens`);
-    lines.push(`- Initial Context:   ${this.formatNumber(this.sessionData.totals.contextTokens)} tokens`);
+    lines.push(`${this.messages.tokenUsageSummary}:`);
+    lines.push(`- ${this.messages.userInput}:        ${this.formatNumber(this.sessionData.totals.userInputTokens)} ${this.messages.tokens}`);
+    lines.push(`- ${this.messages.filesRead}:        ${this.formatNumber(this.sessionData.totals.fileReadTokens)} ${this.messages.tokens}`);
+    lines.push(`- ${this.messages.filesWritten}:     ${this.formatNumber(this.sessionData.totals.fileWriteTokens)} ${this.messages.tokens}`);
+    lines.push(`- ${this.messages.initialContext}:   ${this.formatNumber(this.sessionData.totals.contextTokens)} ${this.messages.tokens}`);
     lines.push('-'.repeat(33));
-    lines.push(`Total Tokens:        ${this.formatNumber(this.sessionData.totals.totalTokens)} tokens`);
+    lines.push(`${this.messages.totalTokens}:        ${this.formatNumber(this.sessionData.totals.totalTokens)} ${this.messages.tokens}`);
     lines.push('');
 
     // コンテキストウィンドウ使用率
     const CONTEXT_WINDOW_SIZE = this.config.contextWindow.size;
     const usagePercent = ((this.sessionData.totals.totalTokens / CONTEXT_WINDOW_SIZE) * 100).toFixed(1);
-    lines.push('Context Window Usage:');
-    lines.push(`- ${usagePercent}% of ${this.formatNumber(CONTEXT_WINDOW_SIZE)} tokens`);
+    lines.push(`${this.messages.contextWindowUsage}:`);
+    lines.push(`- ${usagePercent}% ${this.messages.ofTokens} ${this.formatNumber(CONTEXT_WINDOW_SIZE)} ${this.messages.tokens}`);
     
     // プログレスバー表示
     const barWidth = 30;
@@ -332,47 +403,48 @@ class TokenCalculator {
     const usageRatio = this.sessionData.totals.totalTokens / CONTEXT_WINDOW_SIZE;
     if (usageRatio > this.config.contextWindow.warningThreshold) {
       lines.push('');
-      lines.push('⚠️  WARNING: Context window usage is above ' + (this.config.contextWindow.warningThreshold * 100) + '%!');
-      lines.push('   Old conversation history may be dropped soon.');
+      lines.push(`⚠️  ${this.messages.warning} ${this.config.contextWindow.warningThreshold * 100}%!`);
+      lines.push(`   ${this.messages.warningMessage}`);
     } else if (usageRatio > this.config.contextWindow.cautionThreshold) {
       lines.push('');
-      lines.push('📝 Note: Context window usage is above ' + (this.config.contextWindow.cautionThreshold * 100) + '%.');
+      lines.push(`📝 ${this.messages.note} ${this.config.contextWindow.cautionThreshold * 100}%.`);
     }
     
     lines.push('');
 
     // 言語統計
     const japanesePercent = Math.round(this.sessionData.languageStats.japaneseRatio * 100);
-    lines.push('Language Detection:');
-    lines.push(`- Japanese Content: ${japanesePercent}% (${this.sessionData.languageStats.primaryLanguage === 'ja' ? '日本語として計算' : '英語として計算'})`);
+    lines.push(`${this.messages.languageDetection}:`);
+    const langCalc = this.sessionData.languageStats.primaryLanguage === 'ja' ? this.messages.japanese : this.messages.english;
+    lines.push(`- ${this.messages.japaneseContent}: ${japanesePercent}% ${this.messages.calculatedAs}${langCalc}${this.messages.calculatedAsSuffix}`);
     
     // 詳細表示
     if (verbose) {
       lines.push('');
-      lines.push('Detailed Breakdown:');
+      lines.push(`${this.messages.detailedBreakdown}:`);
       lines.push('');
       
       // ユーザー入力
       if (this.sessionData.userInputs.length > 0) {
-        lines.push('User Inputs:');
+        lines.push(`${this.messages.userInputs}:`);
         this.sessionData.userInputs.slice(-5).forEach((input, index) => {
           const preview = input.text.substring(0, 50).replace(/\n/g, ' ');
-          lines.push(`  ${index + 1}. ${preview}... (${input.tokens} tokens)`);
+          lines.push(`  ${index + 1}. ${preview}... (${input.tokens} ${this.messages.tokens})`);
         });
         lines.push('');
       }
       
       // 読み込みファイル
       if (this.sessionData.filesRead.length > 0) {
-        lines.push('Files Read:');
+        lines.push(`${this.messages.filesReadList}:`);
         const uniqueFiles = this.getUniqueFiles(this.sessionData.filesRead);
         uniqueFiles.slice(-10).forEach(file => {
           const fileName = path.basename(file.filePath);
           if (file.estimated) {
             // 推定値の場合は(推定)を表示
-            lines.push(`  - ${fileName}: ${file.tokens} tokens (推定)`);
+            lines.push(`  - ${fileName}: ${file.tokens} ${this.messages.tokens} (${this.messages.estimated})`);
           } else {
-            lines.push(`  - ${fileName}: ${file.tokens} tokens (${this.formatBytes(file.size)}, ${file.language})`);
+            lines.push(`  - ${fileName}: ${file.tokens} ${this.messages.tokens} (${this.formatBytes(file.size)}, ${file.language})`);
           }
         });
         lines.push('');
@@ -380,11 +452,11 @@ class TokenCalculator {
       
       // 書き込みファイル
       if (this.sessionData.filesWritten.length > 0) {
-        lines.push('Files Written:');
+        lines.push(`${this.messages.filesWrittenList}:`);
         const uniqueFiles = this.getUniqueFiles(this.sessionData.filesWritten);
         uniqueFiles.slice(-10).forEach(file => {
           const fileName = path.basename(file.filePath);
-          lines.push(`  - ${fileName}: ${file.tokens} tokens (${this.formatBytes(file.size)})`);
+          lines.push(`  - ${fileName}: ${file.tokens} ${this.messages.tokens} (${this.formatBytes(file.size)})`);
         });
       }
     }
